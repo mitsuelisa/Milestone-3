@@ -1,0 +1,75 @@
+---
+title: "Milestone-3"
+author: "Mitsue Guerrero"
+date: "10/4/2019"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE)
+library(tidyverse)
+library(janitor)
+library(httr)
+library(pageviews)
+library(jsonlite)
+library(gt)
+
+```
+
+
+# Project Domain: 
+### Water stress in Mexico City
+
+# Description:
+
+<br>I will use 2019 data from the water department in Mexico City (SACMEX) to compare water consumption per neighborhoods (colonias) and which of these are at risk due to high precipitation. </br>
+
+I will use the localization data (geographic coordinates) to join them.
+
+# Source:
+[Datos Abiertos Ciudad de Mexico](https://datos.cdmx.gob.mx/explore/dataset/consumo-agua/information/?location=10,19.35762,-99.14463&dataChart=eyJxdWVyaWVzIjpbeyJjaGFydHMiOlt7InR5cGUiOiJiYXIiLCJmdW5jIjoiQ09VTlQiLCJ5QXhpcyI6ImNvbnN1bW8iLCJzY2llbnRpZmljRGlzcGxheSI6dHJ1ZSwiY29sb3IiOiJyYW5nZS1CbHVlcyJ9XSwieEF4aXMiOiJhbGNhbGRpYSIsIm1heHBvaW50cyI6NTAsInNvcnQiOiIiLCJzZXJpZXNCcmVha2Rvd24iOiJpbmRpY2VfZGVzYXJyb2xsbyIsInN0YWNrZWQiOiJub3JtYWwiLCJjb25maWciOnsiZGF0YXNldCI6ImNvbnN1bW8tYWd1YSIsIm9wdGlvbnMiOnt9fX1dLCJ0aW1lc2NhbGUiOiIiLCJkaXNwbGF5TGVnZW5kIjp0cnVlLCJhbGlnbk1vbnRoIjp0cnVlfQ%3D%3D)
+
+Look at Rmd file to see R chunks that try to process the data.
+
+```{r data Source 1 Water COnsumption from API}
+
+get_data1 <- GET("https://datos.cdmx.gob.mx/api/records/1.0/search/?dataset=consumo-agua&facet=alcaldia&facet=colonia&facet=bimestre&facet=indice_des") 
+
+get_data1_txt <-content(get_data1, as = "text")
+
+get_data1_json <- fromJSON(get_data1_txt, simplifyDataFrame = TRUE)
+
+#I 've been trying to fix this error with the number of rows when trying to transform it into the data base. I plan to meet with a TF to help me figure this out.
+#as.data.frame(get_data1_json, make.names = TRUE, stringsAsFactors = default.stringsAsFactors())
+
+#view(get_data1_json)
+```
+
+
+```{r Data Source 2 Precipitation from API}
+
+get_data2 <- GET("https://datos.cdmx.gob.mx/api/records/1.0/search/?dataset=atlas-de-riesgo-precipitacion&facet=intensidad&facet=alcaldia&facet=intens_num") 
+
+get_data2_txt <-content(get_data2, as = "text")
+
+get_data2_json <- fromJSON(get_data2_txt, simplifyDataFrame = TRUE)
+
+#I 've been trying to fix this error with the number of rows when trying to transform it into the data base. I plan to meet with a TF to help me figure this out.
+#as.data.frame(get_data2_json, make.names = TRUE, stringsAsFactors = default.stringsAsFactors())
+
+#view(get_data2_json)
+```
+
+
+```{r Data Source 1 and 2 from CSV}
+
+#I was able to create a Table that showed the data, but it told me the file was too large for github and didn't let me commit.
+
+#data1_csv <- read_delim("raw-data/consumo-agua.csv", ";") %>% clean_names() %>% select(-geo_shape) %>% head(5) 
+#gt(data1_csv) %>% tab_header(title = "Water Consumption in CDMX",
+                    #subtitle = "2019 (Sample of 5)") 
+
+#data2_csv <- read_delim("raw-data/atlas-de-riesgo-precipitacion.csv", ";") %>% clean_names() %>% select(-geoshape) %>% head(5)
+#gt(data2_csv) %>% tab_header(title = "Precipitation profile in CDMX",
+                    #subtitle = "2019 (Sample of 5)") 
+```
